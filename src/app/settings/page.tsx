@@ -355,7 +355,7 @@ export default function SettingsPage() {
   }
 
   // Pre-generate dynamic VietQR preview URL for visual feedback
-  const previewMemo = "GENICENTER DONG HOC PHI";
+  const previewMemo = "LE KHANH LOAN DONG HOC PHI";
   const previewQrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo || '0000000000'}-compact2.png?amount=500000&addInfo=${encodeURIComponent(previewMemo)}&accountName=${encodeURIComponent(accountName || 'CHUYEN KHOAN MAU')}`;
 
   const plusRules = rules.filter(r => r.type === 'plus');

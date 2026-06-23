@@ -184,7 +184,7 @@ const initialPayments: TuitionPayment[] = [
 const defaultBankSettings: BankSettings = {
   bankId: 'MB',
   accountNo: '0987654321',
-  accountName: 'TRUNG TAM GENICENTER'
+  accountName: 'TRUNG TAM LE KHANH LOAN'
 };
 
 const initialSessions: ClassSession[] = [

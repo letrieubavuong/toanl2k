@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/components/ThemeContext';
 import { AppLayout } from '@/components/AppLayout';
 
 export const metadata: Metadata = {
-  title: 'GeniCenter - Quản Lý Trung Tâm Học Thêm',
+  title: 'LÊ KHÁNH LOAN - Quản Lý Trung Tâm Học Thêm',
   description: 'Hệ thống quản lý lớp học, điểm danh, học viên và học phí chuyên sâu dành cho trung tâm học thêm và giáo viên dạy thêm.',
 };
 

@@ -37,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <aside className={`sidebar glass ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-brand">
           <GraduationCap size={28} className="brand-icon" />
-          <span className="brand-name">GeniCenter</span>
+          <span className="brand-name">LÊ KHÁNH LOAN</span>
           <button className="mobile-close" onClick={onClose}>
             <X size={20} />
           </button>
@@ -66,7 +66,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
             <div className="user-avatar">LK</div>
             <div className="user-info">
               <span className="user-name">LÊ KHÁNH LOAN</span>
-              <span className="user-role">Giáo Vụ Trung Tâm</span>
+              <span className="user-role">Giám Đốc Trung Tâm</span>
             </div>
           </div>
         </div>

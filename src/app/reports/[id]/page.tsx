@@ -53,7 +53,7 @@ export default function ParentReportPage() {
   const [bankSettings, setBankSettings] = useState({
     bankId: 'MB',
     accountNo: '0987654321',
-    accountName: 'TRUNG TAM GENICENTER'
+    accountName: 'TRUNG TAM LE KHANH LOAN'
   });
   
   const [dbState, setDbState] = useState<any>(null);
@@ -161,7 +161,7 @@ export default function ParentReportPage() {
   };
 
   // Generate VietQR URL dynamically based on settings
-  const memoText = `Dong hoc phi GeniCenter ${student.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')}`;
+  const memoText = `Dong hoc phi LE KHANH LOAN ${student.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D')}`;
   const vietQrUrl = `https://img.vietqr.io/image/${bankSettings.bankId}-${bankSettings.accountNo}-compact2.png?amount=${outstandingDebt}&addInfo=${encodeURIComponent(memoText)}&accountName=${encodeURIComponent(bankSettings.accountName)}`;
 
   return (
@@ -171,7 +171,7 @@ export default function ParentReportPage() {
         <GraduationCap size={32} className="header-logo" />
         <div className="header-info">
           <h1>Sổ Liên Lạc Điện Tử</h1>
-          <p>Hệ thống Báo cáo Học tập &amp; Học phí GeniCenter</p>
+          <p>Hệ thống Báo cáo Học tập &amp; Học phí LÊ KHÁNH LOAN</p>
         </div>
       </div>
 

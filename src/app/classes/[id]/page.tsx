@@ -1790,7 +1790,7 @@ export default function ClassDetailsPage() {
               <div className="slip-border-container">
                 <div className="slip-header">
                   <h2>PHIẾU LIÊN LẠC HỌC TẬP</h2>
-                  <span className="slip-brand">Hệ thống Đào tạo GeniCenter</span>
+                  <span className="slip-brand">Hệ thống Đào tạo LÊ KHÁNH LOAN</span>
                   <div className="divider-line"></div>
                 </div>
 
