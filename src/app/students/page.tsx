@@ -48,6 +48,7 @@ export default function StudentsPage() {
   const [studentGrade, setStudentGrade] = useState(9);
   const [parentName, setParentName] = useState('');
   const [parentPhone, setParentPhone] = useState('');
+  const [discountPercentage, setDiscountPercentage] = useState(0);
 
   // Collect Tuition Modal State
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -94,6 +95,7 @@ export default function StudentsPage() {
     setStudentGrade(9);
     setParentName('');
     setParentPhone('');
+    setDiscountPercentage(0);
     setIsRegModalOpen(true);
   };
 
@@ -104,6 +106,7 @@ export default function StudentsPage() {
     setStudentGrade(student.grade);
     setParentName(student.parentName);
     setParentPhone(student.parentPhone);
+    setDiscountPercentage(student.discountPercentage || 0);
     setIsRegModalOpen(true);
   };
 
@@ -114,12 +117,15 @@ export default function StudentsPage() {
       return;
     }
 
+    const discountVal = Math.min(100, Math.max(0, Number(discountPercentage) || 0));
+
     if (isEditMode) {
       updateStudent(currentStudentId, {
         name: studentName,
         grade: studentGrade,
         parentName,
-        parentPhone
+        parentPhone,
+        discountPercentage: discountVal
       });
       triggerToast('Đã cập nhật thông tin học sinh!');
     } else {
@@ -127,7 +133,8 @@ export default function StudentsPage() {
         name: studentName,
         grade: studentGrade,
         parentName,
-        parentPhone
+        parentPhone,
+        discountPercentage: discountVal
       });
       triggerToast('Đăng ký học sinh mới thành công!');
     }
@@ -340,7 +347,14 @@ export default function StudentsPage() {
                           {std.name.split(' ').pop()?.substring(0, 2)}
                         </div>
                         <div className="student-name-group">
-                          <strong className="std-name">{std.name}</strong>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <strong className="std-name">{std.name}</strong>
+                            {std.discountPercentage ? (
+                              <span className="badge badge-success" style={{ fontSize: '0.65rem', padding: '1px 6px', backgroundColor: 'var(--success-light)', color: 'var(--success)' }}>
+                                Giảm {std.discountPercentage}%
+                              </span>
+                            ) : null}
+                          </div>
                           <span className="std-date">Nhập học: {std.joinedDate}</span>
                         </div>
                       </div>
@@ -482,6 +496,19 @@ export default function StudentsPage() {
                   value={parentName}
                   onChange={(e) => setParentName(e.target.value)}
                   required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Miễn giảm học phí (%)</label>
+                <input 
+                  type="number" 
+                  className="form-input" 
+                  placeholder="Ví dụ: 10% (nhập 10) hoặc 0"
+                  value={discountPercentage || ''}
+                  onChange={(e) => setDiscountPercentage(Number(e.target.value))}
+                  min={0}
+                  max={100}
                 />
               </div>
 

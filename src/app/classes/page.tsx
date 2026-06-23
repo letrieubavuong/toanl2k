@@ -13,7 +13,7 @@ export default function ClassesPage() {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newClassName, setNewClassName] = useState('');
-  const [subject, setSubject] = useState('');
+  const [subject, setSubject] = useState('Toán');
   const [grade, setGrade] = useState(9);
   const [tuitionFee, setTuitionFee] = useState(800000);
 
@@ -50,7 +50,7 @@ export default function ClassesPage() {
 
     // Reset Form
     setNewClassName('');
-    setSubject('');
+    setSubject('Toán');
     setGrade(9);
     setTuitionFee(800000);
     setIsModalOpen(false);
@@ -147,14 +147,16 @@ export default function ClassesPage() {
 
               <div className="form-group">
                 <label className="form-label">Môn học</label>
-                <input 
-                  type="text" 
-                  className="form-input" 
-                  placeholder="Ví dụ: Toán, Tiếng Anh, Vật Lý"
+                <select 
+                  className="form-input select-input" 
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
                   required
-                />
+                >
+                  <option value="Toán">Toán</option>
+                  <option value="Vật lí">Vật lí</option>
+                  <option value="KHTN">KHTN</option>
+                </select>
               </div>
 
               <div className="grid-inputs">

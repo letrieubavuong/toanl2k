@@ -164,7 +164,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="card stat-card">
+        <Link href="/students" className="card stat-card">
           <div className="stat-header">
             <span className="stat-label">Học phí còn nợ</span>
             <div className="stat-icon-wrapper debt">
@@ -175,7 +175,7 @@ export default function Dashboard() {
           <div className="stat-footer">
             <span className="trend-neg">Cần nhắc phụ huynh</span>
           </div>
-        </div>
+        </Link>
       </section>
 
       {/* Charts & Analytics */}

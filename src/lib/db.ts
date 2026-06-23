@@ -10,6 +10,7 @@ export interface Student {
   parentPhone: string;
   joinedDate: string; // YYYY-MM-DD
   teacherNote?: string; // Teacher feedback / comments
+  discountPercentage?: number; // % giảm trừ học phí
 }
 
 export interface Class {
@@ -708,8 +709,9 @@ export const calculateTuitionForMonth = (
   const db = getDB();
   const enrollment = db.enrollments.find(e => e.studentId === studentId && e.classId === classId);
   const cls = db.classes.find(c => c.id === classId);
+  const student = db.students.find(s => s.id === studentId);
   
-  if (!enrollment || !cls) {
+  if (!enrollment || !cls || !student) {
     return {
       scheduledSessions: 0,
       absences: 0,
@@ -793,7 +795,13 @@ export const calculateTuitionForMonth = (
   });
 
   const discountAmount = targetDiscountSessions * Math.round(cls.tuitionFee / 12);
-  const recommendedDue = Math.max(0, cls.tuitionFee - discountAmount);
+  let recommendedDue = Math.max(0, cls.tuitionFee - discountAmount);
+
+  // Apply student discount percentage if configured
+  const studentDiscountPercent = student.discountPercentage || 0;
+  if (studentDiscountPercent > 0) {
+    recommendedDue = Math.round(recommendedDue * (1 - studentDiscountPercent / 100));
+  }
 
   return {
     scheduledSessions: targetScheduled,

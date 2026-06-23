@@ -1653,13 +1653,16 @@ export default function ClassDetailsPage() {
 
               <div className="form-group">
                 <label className="form-label">Môn học</label>
-                <input 
-                  type="text" 
-                  className="form-input" 
+                <select 
+                  className="form-input select-input" 
                   value={editClassSubject}
                   onChange={(e) => setEditClassSubject(e.target.value)}
                   required
-                />
+                >
+                  <option value="Toán">Toán</option>
+                  <option value="Vật lí">Vật lí</option>
+                  <option value="KHTN">KHTN</option>
+                </select>
               </div>
 
               <div className="grid-inputs">
