@@ -52,6 +52,7 @@ export default function SettingsPage() {
     { id: 'ICB', name: 'VietinBank - Công thương VN' },
     { id: 'BIDV', name: 'BIDV - Đầu tư và Phát triển VN' },
     { id: 'TCB', name: 'Techcombank - Kỹ thương VN' },
+    { id: 'STB', name: 'Sacombank - Sài Gòn Thương Tín' },
     { id: 'VBA', name: 'Agribank - Nông nghiệp VN' },
     { id: 'ACB', name: 'ACB - Á Châu' },
     { id: 'VPB', name: 'VPBank - Việt Nam Thịnh Vượng' },

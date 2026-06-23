@@ -63,10 +63,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
         <div className="sidebar-footer">
           <div className="user-profile">
-            <div className="user-avatar">AD</div>
+            <div className="user-avatar">LK</div>
             <div className="user-info">
-              <span className="user-name">Admin Giáo Vụ</span>
-              <span className="user-role">Quản trị viên</span>
+              <span className="user-name">LÊ KHÁNH LOAN</span>
+              <span className="user-role">Giáo Vụ Trung Tâm</span>
             </div>
           </div>
         </div>

@@ -107,7 +107,7 @@ export default function Dashboard() {
       {/* Welcome Banner */}
       <div className="welcome-banner glass">
         <div className="welcome-text">
-          <h2>Xin chào, Giáo Vụ GeniCenter 👋</h2>
+          <h2>Xin chào, LÊ KHÁNH LOAN 👋</h2>
           <p>Chào mừng bạn trở lại hệ thống quản lý. Dưới đây là tóm tắt nhanh hoạt động của trung tâm hôm nay.</p>
         </div>
         <div className="quick-actions">
