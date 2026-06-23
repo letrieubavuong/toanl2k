@@ -39,6 +39,7 @@ export default function StudentsPage() {
   // Search & Filter State
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGrade, setSelectedGrade] = useState<string>('all');
+  const [tuitionFilter, setTuitionFilter] = useState<'all' | 'debt' | 'paid'>('all');
 
   // Register Modal State
   const [isRegModalOpen, setIsRegModalOpen] = useState(false);
@@ -81,6 +82,15 @@ export default function StudentsPage() {
   useEffect(() => {
     setMounted(true);
     loadData();
+
+    // Check query params to pre-filter tuition status
+    if (typeof window !== 'undefined') {
+      const query = new URLSearchParams(window.location.search);
+      const filter = query.get('filter');
+      if (filter === 'debt' || filter === 'paid' || filter === 'all') {
+        setTuitionFilter(filter as any);
+      }
+    }
   }, []);
 
   const triggerToast = (msg: string) => {
@@ -255,7 +265,13 @@ export default function StudentsPage() {
       selectedGrade === 'all' || 
       s.grade === Number(selectedGrade);
     
-    return matchesSearch && matchesGrade;
+    const debt = getStudentDebt(s.id);
+    const matchesTuition = 
+      tuitionFilter === 'all' || 
+      (tuitionFilter === 'debt' && debt > 0) || 
+      (tuitionFilter === 'paid' && debt === 0);
+    
+    return matchesSearch && matchesGrade && matchesTuition;
   });
 
   const formatVND = (num: number) => {
@@ -297,20 +313,39 @@ export default function StudentsPage() {
           />
         </div>
         
-        <div className="filter-box">
-          <label className="form-label" style={{ marginBottom: 0, marginRight: '10px', whiteSpace: 'nowrap' }}>
-            Lọc theo khối:
-          </label>
-          <select 
-            className="form-input filter-select"
-            value={selectedGrade}
-            onChange={(e) => setSelectedGrade(e.target.value)}
-          >
-            <option value="all">Tất cả khối lớp</option>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
-              <option key={g} value={g}>Khối {g}</option>
-            ))}
-          </select>
+        <div className="filter-box" style={{ gap: '15px' }}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <label className="form-label" style={{ marginBottom: 0, marginRight: '10px', whiteSpace: 'nowrap' }}>
+              Lọc khối:
+            </label>
+            <select 
+              className="form-input filter-select"
+              value={selectedGrade}
+              onChange={(e) => setSelectedGrade(e.target.value)}
+              style={{ width: '130px' }}
+            >
+              <option value="all">Tất cả khối</option>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
+                <option key={g} value={g}>Khối {g}</option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <label className="form-label" style={{ marginBottom: 0, marginRight: '10px', whiteSpace: 'nowrap' }}>
+              Học phí:
+            </label>
+            <select 
+              className="form-input filter-select"
+              value={tuitionFilter}
+              onChange={(e) => setTuitionFilter(e.target.value as any)}
+              style={{ width: '170px' }}
+            >
+              <option value="all">Tất cả trạng thái</option>
+              <option value="debt">Chưa đóng (Còn nợ)</option>
+              <option value="paid">Đã đóng đủ (Không nợ)</option>
+            </select>
+          </div>
         </div>
       </div>
 

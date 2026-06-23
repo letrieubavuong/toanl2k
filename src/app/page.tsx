@@ -164,7 +164,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <Link href="/students" className="card stat-card">
+        <Link href="/students?filter=debt" className="card stat-card">
           <div className="stat-header">
             <span className="stat-label">Học phí còn nợ</span>
             <div className="stat-icon-wrapper debt">
