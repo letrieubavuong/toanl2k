@@ -55,6 +55,7 @@ export default function StudentsPage() {
   const [parentName, setParentName] = useState('');
   const [parentPhone, setParentPhone] = useState('');
   const [discountPercentage, setDiscountPercentage] = useState(0);
+  const [joinedDate, setJoinedDate] = useState(() => new Date().toISOString().split('T')[0]);
 
   // Student Detail Modal State
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -115,6 +116,7 @@ export default function StudentsPage() {
     setParentName('');
     setParentPhone('');
     setDiscountPercentage(0);
+    setJoinedDate(new Date().toISOString().split('T')[0]);
     setIsRegModalOpen(true);
   };
 
@@ -126,24 +128,27 @@ export default function StudentsPage() {
     setParentName(student.parentName);
     setParentPhone(student.parentPhone);
     setDiscountPercentage(student.discountPercentage || 0);
+    setJoinedDate(student.joinedDate || new Date().toISOString().split('T')[0]);
     setIsRegModalOpen(true);
   };
 
   const handleSaveStudent = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!studentName.trim() || !parentName.trim() || !parentPhone.trim()) {
-      alert('Vui lòng nhập đầy đủ thông tin.');
+    if (!studentName.trim() || !parentPhone.trim()) {
+      alert('Vui lòng nhập đầy đủ tên học sinh và số điện thoại phụ huynh.');
       return;
     }
 
     const discountVal = Math.min(100, Math.max(0, Number(discountPercentage) || 0));
+    const finalParentName = parentName.trim() || 'Unknown';
 
     if (isEditMode) {
       updateStudent(currentStudentId, {
         name: studentName,
         grade: studentGrade,
-        parentName,
+        parentName: finalParentName,
         parentPhone,
+        joinedDate,
         discountPercentage: discountVal
       });
       triggerToast('Đã cập nhật thông tin học sinh!');
@@ -151,8 +156,9 @@ export default function StudentsPage() {
       addStudent({
         name: studentName,
         grade: studentGrade,
-        parentName,
+        parentName: finalParentName,
         parentPhone,
+        joinedDate,
         discountPercentage: discountVal
       });
       triggerToast('Đăng ký học sinh mới thành công!');
@@ -540,13 +546,23 @@ Giám Đốc Trung Tâm LÊ KHÁNH LOAN.`;
               </div>
 
               <div className="form-group">
-                <label className="form-label">Họ tên phụ huynh</label>
+                <label className="form-label">Họ tên phụ huynh <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 400 }}>(Để trống nếu chưa có)</span></label>
                 <input 
                   type="text" 
                   className="form-input" 
-                  placeholder="Ví dụ: Lê Văn Dũng"
+                  placeholder="Ví dụ: Lê Văn Dũng (hoặc để trống)"
                   value={parentName}
                   onChange={(e) => setParentName(e.target.value)}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Ngày nhập học</label>
+                <input 
+                  type="date" 
+                  className="form-input" 
+                  value={joinedDate}
+                  onChange={(e) => setJoinedDate(e.target.value)}
                   required
                 />
               </div>

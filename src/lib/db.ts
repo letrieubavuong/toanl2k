@@ -384,12 +384,12 @@ export const deleteClassSession = (id: string): void => {
 // Students
 export const getStudents = (): Student[] => getDB().students;
 
-export const addStudent = (student: Omit<Student, 'id' | 'joinedDate'>): Student => {
+export const addStudent = (student: Omit<Student, 'id'> & { joinedDate?: string }): Student => {
   const db = getDB();
   const newStudent: Student = {
     ...student,
     id: `std-${Date.now()}`,
-    joinedDate: new Date().toISOString().split('T')[0]
+    joinedDate: student.joinedDate || new Date().toISOString().split('T')[0]
   };
   db.students.push(newStudent);
   saveDB(db);

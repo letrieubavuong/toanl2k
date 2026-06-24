@@ -121,8 +121,15 @@ export default function ClassDetailsPage() {
   const [newStudentParentPhone, setNewStudentParentPhone] = useState('');
   const [enrollDate, setEnrollDate] = useState(() => new Date().toISOString().split('T')[0]);
 
-  // Selected Student for Detail Modal
+  // Selected Student for Detail Modal (now editable)
   const [selectedStudentForDetail, setSelectedStudentForDetail] = useState<Student | null>(null);
+  const [editStudentName, setEditStudentName] = useState('');
+  const [editStudentGrade, setEditStudentGrade] = useState(9);
+  const [editStudentParentName, setEditStudentParentName] = useState('');
+  const [editStudentParentPhone, setEditStudentParentPhone] = useState('');
+  const [editStudentJoinedDate, setEditStudentJoinedDate] = useState('');
+  const [editStudentDiscount, setEditStudentDiscount] = useState(0);
+  const [editStudentSaveToast, setEditStudentSaveToast] = useState(false);
 
   // Edit Class Modal State
   const [isEditClassModalOpen, setIsEditClassModalOpen] = useState(false);
@@ -253,17 +260,20 @@ export default function ClassDetailsPage() {
 
   const handleEnrollNew = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newStudentName.trim() || !newStudentParentName.trim() || !newStudentParentPhone.trim()) {
-      alert('Vui lòng điền đầy đủ thông tin học sinh mới.');
+    if (!newStudentName.trim() || !newStudentParentPhone.trim()) {
+      alert('Vui lòng điền đầy đủ tên học sinh và số điện thoại phụ huynh.');
       return;
     }
 
-    // 1. Add student to Center roster
+    const finalParentName = newStudentParentName.trim() || 'Unknown';
+
+    // 1. Add student to Center roster with the specified joinedDate
     const newStd = addStudent({
       name: newStudentName,
       grade: newStudentGrade,
-      parentName: newStudentParentName,
-      parentPhone: newStudentParentPhone
+      parentName: finalParentName,
+      parentPhone: newStudentParentPhone,
+      joinedDate: enrollDate
     });
 
     // 2. Enroll student in current class
@@ -329,6 +339,53 @@ export default function ClassDetailsPage() {
   const handleOpenQRModal = (student: Student) => {
     setSelectedStudentForQR(student);
     setQrTeacherNote(student.teacherNote || '');
+  };
+
+  // Open Student Detail/Edit Modal
+  const handleOpenStudentDetail = (student: Student) => {
+    setSelectedStudentForDetail(student);
+    setEditStudentName(student.name);
+    setEditStudentGrade(student.grade);
+    setEditStudentParentName(student.parentName);
+    setEditStudentParentPhone(student.parentPhone);
+    setEditStudentJoinedDate(student.joinedDate || new Date().toISOString().split('T')[0]);
+    setEditStudentDiscount(student.discountPercentage || 0);
+  };
+
+  // Save Student Edit from Detail Modal
+  const handleSaveStudentEdit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedStudentForDetail) return;
+    if (!editStudentName.trim() || !editStudentParentPhone.trim()) {
+      alert('Vui lòng nhập đầy đủ tên học sinh và số điện thoại phụ huynh.');
+      return;
+    }
+
+    const finalParentName = editStudentParentName.trim() || 'Unknown';
+    updateStudent(selectedStudentForDetail.id, {
+      name: editStudentName,
+      grade: editStudentGrade,
+      parentName: finalParentName,
+      parentPhone: editStudentParentPhone,
+      joinedDate: editStudentJoinedDate,
+      discountPercentage: Math.min(100, Math.max(0, Number(editStudentDiscount) || 0))
+    });
+
+    // Refresh
+    loadData();
+    // Update the local state so the modal reflects the saved values immediately
+    setSelectedStudentForDetail(prev => prev ? {
+      ...prev,
+      name: editStudentName,
+      grade: editStudentGrade,
+      parentName: finalParentName,
+      parentPhone: editStudentParentPhone,
+      joinedDate: editStudentJoinedDate,
+      discountPercentage: Math.min(100, Math.max(0, Number(editStudentDiscount) || 0))
+    } : null);
+
+    setEditStudentSaveToast(true);
+    setTimeout(() => setEditStudentSaveToast(false), 3000);
   };
 
   // Save teacher note inside QR modal
@@ -737,8 +794,8 @@ export default function ClassDetailsPage() {
                         <button 
                           type="button"
                           className="student-details-trigger"
-                          onClick={() => setSelectedStudentForDetail(std)}
-                          title="Xem chi tiết học sinh"
+                          onClick={() => handleOpenStudentDetail(std)}
+                          title="Xem & cập nhật thông tin học sinh"
                         >
                           <strong className="student-name-cell">{std.name}</strong>
                         </button>
@@ -1424,14 +1481,13 @@ export default function ClassDetailsPage() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Tên phụ huynh (Bố/Mẹ)</label>
+                  <label className="form-label">Tên phụ huynh (Bố/Mẹ) <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 400 }}>(Để trống nếu chưa có)</span></label>
                   <input 
                     type="text" 
                     className="form-input" 
-                    placeholder="Ví dụ: Nguyễn Văn Hải"
+                    placeholder="Ví dụ: Nguyễn Văn Hải (hoặc để trống)"
                     value={newStudentParentName}
                     onChange={(e) => setNewStudentParentName(e.target.value)}
-                    required
                   />
                 </div>
 
@@ -1465,62 +1521,129 @@ export default function ClassDetailsPage() {
         </div>
       )}
 
-      {/* Student Detail Modal */}
+      {/* Student Detail / Edit Modal */}
       {selectedStudentForDetail && (
         <div className="modal-overlay" onClick={() => setSelectedStudentForDetail(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px', width: '90%' }}>
             <div className="modal-header">
-              <h3 className="modal-title">Thông Tin Chi Tiết Học Sinh</h3>
+              <h3 className="modal-title">Cập Nhật Thông Tin Học Sinh</h3>
               <button className="modal-close" onClick={() => setSelectedStudentForDetail(null)}>
                 <X size={20} />
               </button>
             </div>
             
-            <div className="student-detail-modal-body">
-              <div className="detail-item-row">
-                <span className="label">Họ và tên:</span>
-                <span className="value">{selectedStudentForDetail.name}</span>
+            {/* Save toast inside modal */}
+            {editStudentSaveToast && (
+              <div className="alert alert-success" style={{ margin: '0 0 12px 0', padding: '8px 12px', borderRadius: '6px', fontSize: '0.85rem' }}>
+                <Check size={14} style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline' }} />
+                Đã lưu thông tin học sinh thành công!
               </div>
-              <div className="detail-item-row">
-                <span className="label">Khối lớp:</span>
-                <span className="value">Khối {selectedStudentForDetail.grade}</span>
-              </div>
-              <div className="detail-item-row">
-                <span className="label">Họ tên phụ huynh:</span>
-                <span className="value">{selectedStudentForDetail.parentName}</span>
-              </div>
-              <div className="detail-item-row">
-                <span className="label">SĐT phụ huynh:</span>
-                <span className="value">
-                  <a href={`tel:${selectedStudentForDetail.parentPhone}`} className="text-primary" style={{ textDecoration: 'underline', fontWeight: 600 }}>
-                    {selectedStudentForDetail.parentPhone}
-                  </a>
-                </span>
-              </div>
-              <div className="detail-item-row">
-                <span className="label">Ngày nhập học:</span>
-                <span className="value">{formatDate(selectedStudentForDetail.joinedDate)}</span>
-              </div>
-              
-              <div className="student-detail-classes-section" style={{ marginTop: '20px' }}>
-                <label className="form-label" style={{ marginBottom: '8px', fontWeight: 600 }}>Các lớp học đang tham gia:</label>
-                {getClassesForStudent(selectedStudentForDetail.id).length === 0 ? (
-                  <p className="no-class-text" style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '0.85rem' }}>Chưa học lớp nào.</p>
-                ) : (
-                  <div className="classes-tags-list" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
-                    {getClassesForStudent(selectedStudentForDetail.id).map(c => (
-                      <span key={c.id} className="badge badge-info" style={{ fontSize: '0.75rem' }}>{c.name}</span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            )}
 
-            <div className="modal-actions" style={{ marginTop: '24px' }}>
-              <button type="button" className="btn btn-primary btn-block" onClick={() => setSelectedStudentForDetail(null)}>
-                Đóng cửa sổ
-              </button>
-            </div>
+            <form onSubmit={handleSaveStudentEdit}>
+              <div className="student-detail-modal-body">
+
+                <div className="form-group">
+                  <label className="form-label">Họ và Tên học sinh</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={editStudentName}
+                    onChange={(e) => setEditStudentName(e.target.value)}
+                    placeholder="Ví dụ: Nguyễn Văn An"
+                    required
+                  />
+                </div>
+
+                <div className="grid-inputs">
+                  <div className="form-group">
+                    <label className="form-label">Khối lớp</label>
+                    <select
+                      className="form-input select-input"
+                      value={editStudentGrade}
+                      onChange={(e) => setEditStudentGrade(Number(e.target.value))}
+                    >
+                      {[6, 7, 8, 9, 10, 11, 12].map(g => (
+                        <option key={g} value={g}>Khối {g}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Ngày nhập học</label>
+                    <input
+                      type="date"
+                      className="form-input"
+                      value={editStudentJoinedDate}
+                      onChange={(e) => setEditStudentJoinedDate(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid-inputs">
+                  <div className="form-group">
+                    <label className="form-label">Họ tên phụ huynh</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={editStudentParentName}
+                      onChange={(e) => setEditStudentParentName(e.target.value)}
+                      placeholder="Để trống nếu chưa biết"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Số điện thoại phụ huynh</label>
+                    <input
+                      type="tel"
+                      className="form-input"
+                      value={editStudentParentPhone}
+                      onChange={(e) => setEditStudentParentPhone(e.target.value)}
+                      placeholder="Ví dụ: 0912345678"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Miễn giảm học phí (%)</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={editStudentDiscount || ''}
+                    onChange={(e) => setEditStudentDiscount(Number(e.target.value))}
+                    min={0}
+                    max={100}
+                    placeholder="0"
+                  />
+                </div>
+
+                {/* Classes info */}
+                <div className="student-detail-classes-section" style={{ marginTop: '16px' }}>
+                  <label className="form-label" style={{ marginBottom: '8px', fontWeight: 600 }}>Các lớp học đang tham gia:</label>
+                  {getClassesForStudent(selectedStudentForDetail.id).length === 0 ? (
+                    <p className="no-class-text" style={{ fontStyle: 'italic', color: 'var(--text-muted)', fontSize: '0.85rem' }}>Chưa học lớp nào.</p>
+                  ) : (
+                    <div className="classes-tags-list" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                      {getClassesForStudent(selectedStudentForDetail.id).map(c => (
+                        <span key={c.id} className="badge badge-info" style={{ fontSize: '0.75rem' }}>{c.name}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="modal-actions" style={{ marginTop: '24px' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setSelectedStudentForDetail(null)}>
+                  Đóng
+                </button>
+                <button type="submit" className="btn btn-primary">
+                  <Save size={16} />
+                  <span>Lưu thay đổi</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
