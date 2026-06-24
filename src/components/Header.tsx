@@ -2,9 +2,8 @@
 
 import React from 'react';
 import { usePathname } from 'next/navigation';
-import { Menu, Sun, Moon, RefreshCw, LogOut } from 'lucide-react';
+import { Menu, Sun, Moon, LogOut } from 'lucide-react';
 import { useTheme } from './ThemeContext';
-import { resetToSeedData } from '@/lib/db';
 
 interface HeaderProps {
   onMenuOpen: () => void;
@@ -25,13 +24,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuOpen }) => {
     return 'Hệ thống Quản lý';
   };
 
-  const handleResetData = () => {
-    if (confirm('Bạn có chắc chắn muốn khôi phục dữ liệu mẫu ban đầu? Toàn bộ các thay đổi hiện tại của bạn sẽ bị xóa.')) {
-      resetToSeedData();
-      window.location.reload();
-    }
-  };
-
   return (
     <header className="header glass">
       <div className="header-left">
@@ -42,15 +34,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuOpen }) => {
       </div>
 
       <div className="header-right">
-        <button 
-          className="header-btn" 
-          onClick={handleResetData}
-          title="Reset dữ liệu mẫu"
-        >
-          <RefreshCw size={18} />
-          <span className="btn-text">Reset Dữ liệu</span>
-        </button>
-
         <button 
           className="header-btn theme-toggle" 
           onClick={toggleTheme}

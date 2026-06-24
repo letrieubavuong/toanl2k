@@ -503,193 +503,49 @@ export default function SettingsPage() {
               )}
             </div>
           </div>
-
-          <div className="settings-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-            {/* Left side: Config parsing and status */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div className="alert alert-info" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.85rem' }}>
-                <Info size={20} style={{ flexShrink: 0, marginTop: '2px' }} />
-                <div>
-                  <strong>Mẹo điền nhanh:</strong> Bạn có thể sao chép toàn bộ khối mã cấu hình <code>{"const firebaseConfig = { ... };"}</code> từ Firebase Console và dán vào ô bên dưới, hệ thống sẽ tự động phân tách và điền tất cả các thông số bên phải cho bạn!
-                </div>
-              </div>
-
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label">Dán mã cấu hình Firebase SDK (Tùy chọn)</label>
-                <textarea
-                  className="form-input"
-                  style={{ fontFamily: 'monospace', fontSize: '0.8rem', minHeight: '120px', resize: 'vertical' }}
-                  placeholder="const firebaseConfig = {&#10;  apiKey: &quot;...&quot;,&#10;  authDomain: &quot;...&quot;,&#10;  projectId: &quot;...&quot;,&#10;  ...&#10;};"
-                  value={fbRawConfig}
-                  onChange={(e) => handleParseRawConfig(e.target.value)}
-                />
-              </div>
-
-              <div className="sync-actions-panel" style={{ borderTop: '1px solid var(--border)', paddingTop: '20px', marginTop: '10px' }}>
-                <h4 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '12px' }}>Đồng bộ thủ công & Quản lý</h4>
-                
-                {lastSyncedTime && (
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                    Đồng bộ lần cuối: <strong>{new Date(lastSyncedTime).toLocaleString('vi-VN')}</strong>
-                  </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div className="alert alert-info" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '0.85rem', margin: 0 }}>
+              <Info size={20} style={{ flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                {isConfigured ? (
+                  <span>Hệ thống đang kết nối và tự động đồng bộ hóa đám mây. Bạn có thể sử dụng các nút dưới đây để đồng bộ dữ liệu thủ công nếu cần thiết.</span>
+                ) : (
+                  <span>Ứng dụng chưa được cấu hình Firebase. Bạn hãy thiết lập các biến môi trường trên Vercel để kích hoạt đồng bộ tự động cho tất cả các thiết bị.</span>
                 )}
-
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <button 
-                    type="button" 
-                    className="btn btn-secondary" 
-                    onClick={handlePushFirebase}
-                    disabled={isSyncing || !fbApiKey}
-                    style={{ gap: '6px', fontSize: '0.85rem' }}
-                  >
-                    <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
-                    <span>Đẩy lên Cloud (Push)</span>
-                  </button>
-
-                  <button 
-                    type="button" 
-                    className="btn btn-secondary" 
-                    onClick={handlePullFirebase}
-                    disabled={isSyncing || !fbApiKey}
-                    style={{ gap: '6px', fontSize: '0.85rem' }}
-                  >
-                    <Database size={14} />
-                    <span>Tải về máy (Pull)</span>
-                  </button>
-
-                  {isConfigured && (
-                    <button 
-                      type="button" 
-                      className="btn" 
-                      onClick={handleDisconnectFirebase}
-                      style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', gap: '6px', fontSize: '0.85rem', border: 'none' }}
-                    >
-                      <Trash2 size={14} />
-                      <span>Xóa cấu hình</span>
-                    </button>
-                  )}
-                </div>
               </div>
             </div>
 
-            {/* Right side: Config Fields */}
-            <form onSubmit={handleSaveFirebase} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Mã trung tâm (Center ID)</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    value={fbCenterId}
-                    onChange={(e) => setFbCenterId(e.target.value.replace(/[^a-zA-Z0-9_-]/g, ''))}
-                    placeholder="ví dụ: toanl2k"
-                    required
-                  />
-                </div>
+            <div className="sync-actions-panel" style={{ borderTop: '1px solid var(--border)', paddingTop: '16px' }}>
+              {lastSyncedTime && (
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '12px', marginTop: 0 }}>
+                  Đồng bộ lần cuối: <strong>{new Date(lastSyncedTime).toLocaleString('vi-VN')}</strong>
+                </p>
+              )}
 
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Project ID *</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    value={fbProjectId}
-                    onChange={(e) => setFbProjectId(e.target.value)}
-                    placeholder="ví dụ: toanl2k"
-                    required
-                  />
-                </div>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={handlePushFirebase}
+                  disabled={isSyncing || !isConfigured}
+                  style={{ gap: '6px', fontSize: '0.85rem' }}
+                >
+                  <RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />
+                  <span>Đẩy lên Cloud (Push)</span>
+                </button>
+
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={handlePullFirebase}
+                  disabled={isSyncing || !isConfigured}
+                  style={{ gap: '6px', fontSize: '0.85rem' }}
+                >
+                  <Database size={14} />
+                  <span>Tải về máy (Pull)</span>
+                </button>
               </div>
-
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ fontSize: '0.8rem' }}>API Key *</label>
-                <input 
-                  type="password" 
-                  className="form-input" 
-                  value={fbApiKey}
-                  onChange={(e) => setFbApiKey(e.target.value)}
-                  placeholder="AIzaSy..."
-                  required
-                />
-              </div>
-
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label className="form-label" style={{ fontSize: '0.8rem' }}>App ID *</label>
-                <input 
-                  type="text" 
-                  className="form-input" 
-                  value={fbAppId}
-                  onChange={(e) => setFbAppId(e.target.value)}
-                  placeholder="1:890950041993:web:..."
-                  required
-                />
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Auth Domain</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    value={fbAuthDomain}
-                    onChange={(e) => setFbAuthDomain(e.target.value)}
-                    placeholder="toanl2k.firebaseapp.com"
-                  />
-                </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Storage Bucket</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    value={fbStorageBucket}
-                    onChange={(e) => setFbStorageBucket(e.target.value)}
-                    placeholder="toanl2k.firebasestorage.app"
-                  />
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Messaging Sender ID</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    value={fbMessagingSenderId}
-                    onChange={(e) => setFbMessagingSenderId(e.target.value)}
-                    placeholder="890950041993"
-                  />
-                </div>
-
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '0.8rem' }}>Measurement ID</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    value={fbMeasurementId}
-                    onChange={(e) => setFbMeasurementId(e.target.value)}
-                    placeholder="G-TV60DNJ0PM"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group" style={{ margin: '10px 0 15px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input 
-                  type="checkbox" 
-                  id="fbAutoSyncCheckbox"
-                  checked={fbAutoSync}
-                  onChange={(e) => setFbAutoSync(e.target.checked)}
-                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
-                />
-                <label htmlFor="fbAutoSyncCheckbox" style={{ fontSize: '0.85rem', fontWeight: 500, cursor: 'pointer', userSelect: 'none' }}>
-                  Tự động đồng bộ hóa đám mây trong nền khi dữ liệu cục bộ thay đổi
-                </label>
-              </div>
-
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', gap: '8px' }} disabled={isSyncing}>
-                <Save size={16} />
-                <span>Lưu & Kích hoạt đồng bộ</span>
-              </button>
-            </form>
+            </div>
           </div>
         </div>
       </div>
