@@ -12,7 +12,11 @@ import {
   Check, 
   Phone, 
   User, 
-  GraduationCap 
+  GraduationCap,
+  Eye,
+  MessageSquare,
+  Copy,
+  ExternalLink
 } from 'lucide-react';
 import { 
   getStudents, 
@@ -50,6 +54,10 @@ export default function StudentsPage() {
   const [parentName, setParentName] = useState('');
   const [parentPhone, setParentPhone] = useState('');
   const [discountPercentage, setDiscountPercentage] = useState(0);
+
+  // Student Detail Modal State
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [detailStudent, setDetailStudent] = useState<Student | null>(null);
 
   // Collect Tuition Modal State
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -256,6 +264,36 @@ export default function StudentsPage() {
       .reduce((acc, curr) => acc + (curr.totalDue - curr.amountPaid), 0);
   };
 
+  const handleCopyZaloReport = (student: Student) => {
+    const classes = studentClasses[student.id] || [];
+    const classNames = classes.length > 0 ? classes.map(c => c.name).join(', ') : 'Chưa tham gia lớp nào';
+    const debt = getStudentDebt(student.id);
+    const originUrl = typeof window !== 'undefined' ? window.location.origin : '';
+    const reportLink = `${originUrl}/reports/${student.id}`;
+    
+    const message = `Kính gửi Phụ huynh em ${student.name},
+
+Trung tâm Toán - Khoa học LÊ KHÁNH LOAN gửi báo cáo tình hình học tập và học phí của con:
+- Học viên: ${student.name} - Khối ${student.grade}
+- Lớp đang học: ${classNames}
+- Học phí còn nợ: ${debt > 0 ? formatVND(debt) : 'Đã đóng đủ (Không nợ)'}
+
+Sổ liên lạc điện tử (Xem điểm danh chi tiết, điểm số, bài tập về nhà và mã QR đóng phí trực tuyến):
+${reportLink}
+
+Trân trọng,
+Giám Đốc Trung Tâm LÊ KHÁNH LOAN.`;
+
+    navigator.clipboard.writeText(message)
+      .then(() => {
+        triggerToast('Đã sao chép báo cáo vào bộ nhớ tạm! Bạn có thể dán (Ctrl+V) gửi qua Zalo.');
+      })
+      .catch(err => {
+        console.error('Lỗi khi sao chép:', err);
+        alert('Không thể tự động sao chép. Vui lòng thử lại.');
+      });
+  };
+
   // Filter students based on search and grade filters
   const filteredStudents = students.filter(s => {
     const matchesSearch = 
@@ -436,6 +474,17 @@ export default function StudentsPage() {
                         >
                           <CreditCard size={14} />
                           <span>Thu học phí</span>
+                        </button>
+
+                        <button 
+                          className="btn btn-secondary btn-sm table-action-btn"
+                          onClick={() => {
+                            setDetailStudent(std);
+                            setIsDetailModalOpen(true);
+                          }}
+                          title="Xem chi tiết & Lịch sử học phí"
+                        >
+                          <Eye size={14} />
                         </button>
 
                         <button 
@@ -698,6 +747,182 @@ export default function StudentsPage() {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Student Detail & Tuition History Modal */}
+      {isDetailModalOpen && detailStudent && (
+        <div className="modal-overlay" onClick={() => setIsDetailModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '800px', width: '95%' }}>
+            <div className="modal-header">
+              <h3 className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <GraduationCap size={22} className="text-primary" />
+                <span>Chi Tiết Hồ Sơ Học Viên</span>
+              </h3>
+              <button className="modal-close" onClick={() => setIsDetailModalOpen(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="modal-body student-detail-modal-body" style={{ maxHeight: '75vh', overflowY: 'auto', paddingRight: '4px' }}>
+              
+              {/* Profile Card Header */}
+              <div className="detail-profile-header-card" style={{ display: 'flex', gap: '20px', alignItems: 'center', padding: '16px', background: 'var(--bg-input)', borderRadius: '12px', border: '1px solid var(--border)', marginBottom: '20px' }}>
+                <div className="student-avatar-large" style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary) 0%, #a5b4fc 100%)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', fontWeight: 600, boxShadow: 'var(--shadow-md)' }}>
+                  {detailStudent.name.split(' ').pop()?.substring(0, 2)}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                    {detailStudent.name}
+                    {detailStudent.discountPercentage ? (
+                      <span className="badge badge-success" style={{ fontSize: '0.7rem', padding: '2px 8px', backgroundColor: 'var(--success-light)', color: 'var(--success)' }}>
+                        Giảm {detailStudent.discountPercentage}% học phí
+                      </span>
+                    ) : null}
+                  </h4>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '6px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                    <span>Khối lớp: <strong>Khối {detailStudent.grade}</strong></span>
+                    <span>•</span>
+                    <span>Ngày nhập học: <strong>{detailStudent.joinedDate}</strong></span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Grid 2 Columns: Contact Info & Zalo Actions */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }} className="detail-grid-cols">
+                <div className="card" style={{ padding: '16px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <h5 style={{ fontWeight: 600, fontSize: '0.95rem', borderBottom: '1px solid var(--border)', paddingBottom: '6px', margin: 0, color: 'var(--text-main)' }}>Thông tin liên hệ</h5>
+                  <div style={{ fontSize: '0.88rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Họ tên phụ huynh:</span>
+                      <strong>{detailStudent.parentName}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ color: 'var(--text-muted)' }}>Số điện thoại:</span>
+                      <strong>{detailStudent.parentPhone}</strong>
+                    </div>
+                  </div>
+                  <div style={{ marginTop: 'auto', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {studentClasses[detailStudent.id]?.length === 0 ? (
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>Chưa tham gia lớp học nào</span>
+                    ) : (
+                      studentClasses[detailStudent.id]?.map(c => (
+                        <span key={c.id} className="badge badge-info" style={{ fontSize: '0.7rem' }}>{c.name}</span>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="card" style={{ padding: '16px', border: '1px solid var(--border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <h5 style={{ fontWeight: 600, fontSize: '0.95rem', borderBottom: '1px solid var(--border)', paddingBottom: '6px', margin: 0, color: 'var(--text-main)' }}>Tương tác Zalo Phụ huynh</h5>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
+                    Liên kết nhanh để nhắn tin Zalo và gửi báo cáo học tập, chuyên cần, hóa đơn học phí cho phụ huynh.
+                  </p>
+                  <div style={{ display: 'flex', gap: '10px', marginTop: 'auto' }}>
+                    <a 
+                      href={`https://zalo.me/${detailStudent.parentPhone.replace(/\D/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-secondary"
+                      style={{ flex: 1, textDecoration: 'none', textAlign: 'center', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.82rem', padding: '8px 12px' }}
+                    >
+                      <ExternalLink size={14} />
+                      <span>Nhắn Zalo</span>
+                    </a>
+                    
+                    <button 
+                      type="button" 
+                      className="btn btn-primary"
+                      onClick={() => handleCopyZaloReport(detailStudent)}
+                      style={{ flex: 1.2, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '0.82rem', padding: '8px 12px' }}
+                    >
+                      <Copy size={14} />
+                      <span>Copy báo cáo</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tuition Payment History */}
+              <div>
+                <h5 style={{ fontWeight: 600, fontSize: '1rem', marginBottom: '12px', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <CreditCard size={18} className="text-primary" />
+                  <span>Lịch sử đóng học phí</span>
+                </h5>
+                
+                {allPayments.filter(p => p.studentId === detailStudent.id).length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '30px 16px', background: 'var(--bg-input)', borderRadius: '8px', border: '1px dashed var(--border)', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                    Chưa có lịch sử học phí nào được tạo cho học viên này.
+                  </div>
+                ) : (
+                  <div className="table-container" style={{ margin: 0, border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden' }}>
+                    <table className="custom-table" style={{ fontSize: '0.82rem' }}>
+                      <thead>
+                        <tr style={{ background: 'var(--bg-input)' }}>
+                          <th style={{ padding: '8px 12px' }}>Kỳ học</th>
+                          <th style={{ padding: '8px 12px' }}>Lớp học</th>
+                          <th style={{ padding: '8px 12px' }}>Học phí</th>
+                          <th style={{ padding: '8px 12px' }}>Đã đóng</th>
+                          <th style={{ padding: '8px 12px' }}>Còn nợ</th>
+                          <th style={{ padding: '8px 12px' }}>Trạng thái</th>
+                          <th style={{ padding: '8px 12px' }}>Ngày đóng</th>
+                          <th style={{ padding: '8px 12px' }}>Ghi chú</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[...allPayments.filter(p => p.studentId === detailStudent.id)]
+                          .sort((a, b) => {
+                            const [aM, aY] = a.month.split('/').map(Number);
+                            const [bM, bY] = b.month.split('/').map(Number);
+                            if (aY !== bY) return bY - aY;
+                            return bM - aM;
+                          })
+                          .map((p) => {
+                            const className = allClasses.find(c => c.id === p.classId)?.name || 'Lớp học';
+                            const remaining = p.totalDue - p.amountPaid;
+                            
+                            return (
+                              <tr key={p.id}>
+                                <td style={{ padding: '8px 12px', fontWeight: 600 }}>Tháng {p.month}</td>
+                                <td style={{ padding: '8px 12px' }}>{className}</td>
+                                <td style={{ padding: '8px 12px' }}>{formatVND(p.totalDue)}</td>
+                                <td style={{ padding: '8px 12px', color: 'var(--success)' }}>{p.amountPaid > 0 ? formatVND(p.amountPaid) : '-'}</td>
+                                <td style={{ padding: '8px 12px', color: remaining > 0 ? 'var(--danger)' : 'inherit', fontWeight: remaining > 0 ? 600 : 'normal' }}>
+                                  {remaining > 0 ? formatVND(remaining) : '-'}
+                                </td>
+                                <td style={{ padding: '8px 12px' }}>
+                                  {p.status === 'paid' && (
+                                    <span className="badge badge-success" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>Đã hoàn tất</span>
+                                  )}
+                                  {p.status === 'partially_paid' && (
+                                    <span className="badge badge-warning" style={{ fontSize: '0.65rem', padding: '1px 6px', backgroundColor: '#fef3c7', color: '#d97706' }}>Đóng một phần</span>
+                                  )}
+                                  {p.status === 'unpaid' && (
+                                    <span className="badge badge-danger" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>Chưa đóng</span>
+                                  )}
+                                </td>
+                                <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>{p.paymentDate || '-'}</td>
+                                <td style={{ padding: '8px 12px', color: 'var(--text-muted)', fontSize: '0.78rem', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={p.note}>
+                                  {p.note || '-'}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+            <div className="modal-actions" style={{ marginTop: '20px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+              <button type="button" className="btn btn-secondary btn-block" onClick={() => setIsDetailModalOpen(false)}>
+                Đóng cửa sổ
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1012,6 +1237,10 @@ export default function StudentsPage() {
           }
           .table-action-btn.paid {
             padding: 8px;
+          }
+          .detail-grid-cols {
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
           }
         }
       `}</style>

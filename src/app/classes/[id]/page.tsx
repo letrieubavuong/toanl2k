@@ -118,6 +118,7 @@ export default function ClassDetailsPage() {
   const [newStudentGrade, setNewStudentGrade] = useState(9);
   const [newStudentParentName, setNewStudentParentName] = useState('');
   const [newStudentParentPhone, setNewStudentParentPhone] = useState('');
+  const [enrollDate, setEnrollDate] = useState(() => new Date().toISOString().split('T')[0]);
 
   // Selected Student for Detail Modal
   const [selectedStudentForDetail, setSelectedStudentForDetail] = useState<Student | null>(null);
@@ -242,8 +243,9 @@ export default function ClassDetailsPage() {
       return;
     }
 
-    enrollStudent(classId, selectedExistingStudentId);
+    enrollStudent(classId, selectedExistingStudentId, enrollDate);
     setSelectedExistingStudentId('');
+    setEnrollDate(new Date().toISOString().split('T')[0]);
     setIsAddModalOpen(false);
     loadData();
   };
@@ -264,12 +266,13 @@ export default function ClassDetailsPage() {
     });
 
     // 2. Enroll student in current class
-    enrollStudent(classId, newStd.id);
+    enrollStudent(classId, newStd.id, enrollDate);
 
     // Reset Form
     setNewStudentName('');
     setNewStudentParentName('');
     setNewStudentParentPhone('');
+    setEnrollDate(new Date().toISOString().split('T')[0]);
     setIsAddModalOpen(false);
     
     // Reload
@@ -1350,6 +1353,17 @@ export default function ClassDetailsPage() {
                   )}
                 </div>
 
+                <div className="form-group">
+                  <label className="form-label">Ngày nhập học vào lớp</label>
+                  <input 
+                    type="date" 
+                    className="form-input" 
+                    value={enrollDate}
+                    onChange={(e) => setEnrollDate(e.target.value)}
+                    required
+                  />
+                </div>
+
                 <div className="modal-actions">
                   <button type="button" className="btn btn-secondary" onClick={() => setIsAddModalOpen(false)}>
                     Hủy bỏ
@@ -1416,6 +1430,17 @@ export default function ClassDetailsPage() {
                     placeholder="Ví dụ: Nguyễn Văn Hải"
                     value={newStudentParentName}
                     onChange={(e) => setNewStudentParentName(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Ngày nhập học vào lớp</label>
+                  <input 
+                    type="date" 
+                    className="form-input" 
+                    value={enrollDate}
+                    onChange={(e) => setEnrollDate(e.target.value)}
                     required
                   />
                 </div>

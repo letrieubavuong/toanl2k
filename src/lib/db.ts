@@ -468,30 +468,47 @@ export const getClassesForStudent = (studentId: string): Class[] => {
   return db.classes.filter(c => classIds.includes(c.id));
 };
 
-export const enrollStudent = (classId: string, studentId: string): void => {
+export const enrollStudent = (classId: string, studentId: string, enrolledDate?: string): void => {
   const db = getDB();
   const alreadyEnrolled = db.enrollments.some(e => e.classId === classId && e.studentId === studentId);
   if (alreadyEnrolled) return;
 
+  const finalEnrolledDate = enrolledDate || new Date().toISOString().split('T')[0];
+
   db.enrollments.push({
     classId,
     studentId,
-    enrolledDate: new Date().toISOString().split('T')[0]
+    enrolledDate: finalEnrolledDate
   });
 
-  // Auto-generate invoice/payment entry for the current month for this student
+  // Auto-generate invoice/payment entry for the month of enrollment for this student
   const cls = db.classes.find(c => c.id === classId);
+  const student = db.students.find(s => s.id === studentId);
   if (cls) {
-    const currentMonth = `${String(new Date().getMonth() + 1).padStart(2, '0')}/${new Date().getFullYear()}`;
-    const paymentExists = db.payments.some(p => p.studentId === studentId && p.classId === classId && p.month === currentMonth);
+    // Parse month from enrolledDate (YYYY-MM-DD)
+    const dateParts = finalEnrolledDate.split('-');
+    let targetMonth = '';
+    if (dateParts.length === 3) {
+      targetMonth = `${dateParts[1]}/${dateParts[0]}`; // MM/YYYY
+    } else {
+      targetMonth = `${String(new Date().getMonth() + 1).padStart(2, '0')}/${new Date().getFullYear()}`;
+    }
+
+    const discountPercent = student?.discountPercentage || 0;
+    let totalDue = cls.tuitionFee;
+    if (discountPercent > 0) {
+      totalDue = Math.round(totalDue * (1 - discountPercent / 100));
+    }
+
+    const paymentExists = db.payments.some(p => p.studentId === studentId && p.classId === classId && p.month === targetMonth);
     if (!paymentExists) {
       db.payments.push({
         id: `pay-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         studentId,
         classId,
-        month: currentMonth,
+        month: targetMonth,
         amountPaid: 0,
-        totalDue: cls.tuitionFee,
+        totalDue: totalDue,
         status: 'unpaid'
       });
     }
