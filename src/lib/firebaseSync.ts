@@ -20,6 +20,24 @@ const isBrowser = typeof window !== 'undefined';
 // --- Local Config Management Helpers ---
 
 export function getSavedFirebaseConfig(): FirebaseConfig | null {
+  // 1. Try to load from environment variables first (Next.js env config)
+  if (
+    process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID &&
+    process.env.NEXT_PUBLIC_FIREBASE_APP_ID
+  ) {
+    return {
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+      measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || undefined
+    };
+  }
+
+  // 2. Fallback to localStorage for custom/runtime config
   if (!isBrowser) return null;
   const stored = localStorage.getItem(CONFIG_KEY);
   if (!stored) return null;
@@ -31,11 +49,20 @@ export function getSavedFirebaseConfig(): FirebaseConfig | null {
 }
 
 export function getSavedCenterId(): string {
+  if (process.env.NEXT_PUBLIC_FIREBASE_CENTER_ID) {
+    return process.env.NEXT_PUBLIC_FIREBASE_CENTER_ID;
+  }
   if (!isBrowser) return 'toanl2k';
   return localStorage.getItem(CENTER_ID_KEY) || 'toanl2k';
 }
 
 export function isAutoSyncEnabled(): boolean {
+  if (process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+    // Default to true if env is set, unless explicitly turned off
+    if (!isBrowser) return true;
+    const stored = localStorage.getItem(AUTO_SYNC_KEY);
+    return stored !== 'false';
+  }
   if (!isBrowser) return false;
   const stored = localStorage.getItem(AUTO_SYNC_KEY);
   return stored === 'true'; // Default to false if not set
