@@ -34,7 +34,8 @@ import {
   TuitionPayment, 
   Attendance,
   ClassTask,
-  StudentEvaluation
+  StudentEvaluation,
+  formatDate
 } from '@/lib/db';
 
 export default function ParentReportPage() {
@@ -263,7 +264,7 @@ export default function ParentReportPage() {
                         {statusIcon}
                         <div className="timeline-details">
                           <div className="timeline-header-row">
-                            <span className="time-date">{att.date}</span>
+                            <span className="time-date">{formatDate(att.date)}</span>
                             <span className="class-name">{getClassName(att.classId)}</span>
                           </div>
                           <span className="status-desc">
@@ -296,7 +297,7 @@ export default function ParentReportPage() {
                     <div>
                       <strong style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>{task.title}</strong>
                       <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                        Hạn nộp: {task.dueDate} • Lớp: {getClassName(task.classId)}
+                        Hạn nộp: {formatDate(task.dueDate)} • Lớp: {getClassName(task.classId)}
                       </div>
                     </div>
                     {hasSubmitted ? (
@@ -356,7 +357,7 @@ export default function ParentReportPage() {
                       <div key={evalItem.id} style={{ padding: '14px', border: '1px solid var(--border)', borderRadius: '10px', background: 'var(--bg-card)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                           <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                            Buổi học ngày {sessionDate || '(Chưa rõ)'}
+                            Buổi học ngày {formatDate(sessionDate) || '(Chưa rõ)'}
                           </span>
                           <span className="badge badge-info" style={{ fontSize: '0.75rem', fontWeight: 700 }}>
                             {sessionScore} / 10 điểm

@@ -58,7 +58,8 @@ import {
   Attendance,
   ClassSession,
   ClassTask,
-  StudentEvaluation
+  StudentEvaluation,
+  formatDate
 } from '@/lib/db';
 
 export default function ClassDetailsPage() {
@@ -679,7 +680,7 @@ export default function ClassDetailsPage() {
       {showSaveAlert && (
         <div className="toast-alert alert alert-success">
           <Check size={16} style={{ marginRight: '8px', verticalAlign: 'middle', display: 'inline' }} />
-          Đã lưu lịch sử điểm danh ngày {attendanceDate} thành công!
+          Đã lưu lịch sử điểm danh ngày {formatDate(attendanceDate)} thành công!
         </div>
       )}
 
@@ -742,7 +743,7 @@ export default function ClassDetailsPage() {
                           <strong className="student-name-cell">{std.name}</strong>
                         </button>
                       </td>
-                      <td>{std.joinedDate}</td>
+                      <td>{formatDate(std.joinedDate)}</td>
                       <td style={{ textAlign: 'right' }}>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
                           <button 
@@ -816,7 +817,7 @@ export default function ClassDetailsPage() {
                     <option value="">-- Chọn buổi học từ lịch --</option>
                     {sessions.map((s, idx) => (
                       <option key={s.id} value={s.id}>
-                        Buổi {idx + 1} ({s.date} - {s.time})
+                        Buổi {idx + 1} ({formatDate(s.date)} - {s.time})
                       </option>
                     ))}
                   </select>
@@ -825,7 +826,7 @@ export default function ClassDetailsPage() {
             </div>
             
             <p className="attendance-info-text" style={{ margin: 0 }}>
-              Bạn đang thực hiện điểm danh cho lớp <strong>{cls.name}</strong> ngày <strong>{attendanceDate}</strong>
+              Bạn đang thực hiện điểm danh cho lớp <strong>{cls.name}</strong> ngày <strong>{formatDate(attendanceDate)}</strong>
               {sessions.find(s => s.date === attendanceDate) && (
                 <>
                   {' '}(Giờ học: <strong>{sessions.find(s => s.date === attendanceDate)?.time}</strong>)
@@ -962,7 +963,7 @@ export default function ClassDetailsPage() {
                         <strong style={{ color: 'var(--primary)' }}>Buổi {idx + 1}</strong>
                       </td>
                       <td>
-                        <span>{sess.date}</span>
+                        <span>{formatDate(sess.date)}</span>
                       </td>
                       <td>
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem' }}>
@@ -1052,7 +1053,7 @@ export default function ClassDetailsPage() {
                           )}
                         </h5>
                         <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                          Hạn nộp: <strong>{task.dueDate}</strong> • Click để {isExpanded ? 'thu gọn' : 'xem chi tiết nộp bài'}
+                          Hạn nộp: <strong>{formatDate(task.dueDate)}</strong> • Click để {isExpanded ? 'thu gọn' : 'xem chi tiết nộp bài'}
                         </p>
                       </div>
                       
@@ -1160,7 +1161,7 @@ export default function ClassDetailsPage() {
                   >
                     {sessions.map((sess, idx) => (
                       <option key={sess.id} value={sess.id}>
-                        Buổi {idx + 1} - Ngày {sess.date} ({sess.time})
+                        Buổi {idx + 1} - Ngày {formatDate(sess.date)} ({sess.time})
                       </option>
                     ))}
                   </select>
@@ -1498,7 +1499,7 @@ export default function ClassDetailsPage() {
               </div>
               <div className="detail-item-row">
                 <span className="label">Ngày nhập học:</span>
-                <span className="value">{selectedStudentForDetail.joinedDate}</span>
+                <span className="value">{formatDate(selectedStudentForDetail.joinedDate)}</span>
               </div>
               
               <div className="student-detail-classes-section" style={{ marginTop: '20px' }}>

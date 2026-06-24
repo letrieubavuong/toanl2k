@@ -12,7 +12,7 @@ import {
   Clock, 
   TrendingUp 
 } from 'lucide-react';
-import { getDashboardStats, getStudents, getClasses, getPayments, getDB, DatabaseState } from '@/lib/db';
+import { getDashboardStats, getStudents, getClasses, getPayments, getDB, DatabaseState, formatDate } from '@/lib/db';
 
 export default function Dashboard() {
   const [mounted, setMounted] = useState(false);
@@ -333,7 +333,7 @@ export default function Dashboard() {
                     <div className="activity-text">
                       <strong>{getStudentName(p.studentId)}</strong> đã đóng học phí lớp <em>{getClassName(p.classId)}</em>
                     </div>
-                    <span className="activity-date">{p.paymentDate} • Tháng {p.month}</span>
+                    <span className="activity-date">{formatDate(p.paymentDate)} • Tháng {p.month}</span>
                   </div>
                   <div className="activity-amount">
                     +{formatVND(p.amountPaid)}
@@ -381,7 +381,7 @@ export default function Dashboard() {
                       <div className="activity-text">
                         <strong>{getStudentName(a.studentId)}</strong> học lớp <em>{getClassName(a.classId)}</em>
                       </div>
-                      <span className="activity-date">{a.date} {a.note ? `• ${a.note}` : ''}</span>
+                      <span className="activity-date">{formatDate(a.date)} {a.note ? `• ${a.note}` : ''}</span>
                     </div>
                     <span className={`badge ${badgeClass}`}>
                       {statusText}

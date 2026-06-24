@@ -28,6 +28,7 @@ import {
   getPayments, 
   savePayment, 
   calculateTuitionForMonth,
+  formatDate,
   Student, 
   Class, 
   TuitionPayment 
@@ -429,7 +430,7 @@ Giám Đốc Trung Tâm LÊ KHÁNH LOAN.`;
                       </div>
                     </td>
                     <td>
-                      <span className="std-date" style={{ fontSize: '0.88rem', color: 'var(--text-main)', fontWeight: 500 }}>{std.joinedDate}</span>
+                      <span className="std-date" style={{ fontSize: '0.88rem', color: 'var(--text-main)', fontWeight: 500 }}>{formatDate(std.joinedDate)}</span>
                     </td>
                     <td style={{ textAlign: 'right' }}>
                       <div className="actions-cell-buttons">
@@ -751,7 +752,7 @@ Giám Đốc Trung Tâm LÊ KHÁNH LOAN.`;
                   <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '6px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                     <span>Khối lớp: <strong>Khối {detailStudent.grade}</strong></span>
                     <span>•</span>
-                    <span>Ngày nhập học: <strong>{detailStudent.joinedDate}</strong></span>
+                    <span>Ngày nhập học: <strong>{formatDate(detailStudent.joinedDate)}</strong></span>
                   </div>
                 </div>
               </div>
@@ -869,7 +870,7 @@ Giám Đốc Trung Tâm LÊ KHÁNH LOAN.`;
                                     <span className="badge badge-danger" style={{ fontSize: '0.65rem', padding: '1px 6px' }}>Chưa đóng</span>
                                   )}
                                 </td>
-                                <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>{p.paymentDate || '-'}</td>
+                                <td style={{ padding: '8px 12px', color: 'var(--text-muted)' }}>{formatDate(p.paymentDate)}</td>
                                 <td style={{ padding: '8px 12px', color: 'var(--text-muted)', fontSize: '0.78rem', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={p.note}>
                                   {p.note || '-'}
                                 </td>
