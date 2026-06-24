@@ -90,7 +90,7 @@ export async function pushToFirebase(centerId: string, state: DatabaseState, con
     const { db, doc, setDoc } = await getFirestoreInstance(config);
     const centerDocRef = doc(db, 'centers', centerId);
     
-    const updateTime = new Date().toISOString();
+    const updateTime = state.updatedAt || new Date().toISOString();
     const payload = {
       ...state,
       updatedAt: updateTime

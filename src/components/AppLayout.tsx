@@ -17,6 +17,7 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
   useEffect(() => {
     let unsubscribe: (() => void) | undefined;
+    let isFirstSnapshot = true;
 
     // Load Firebase sync config dynamically to prevent server-side rendering bundle errors
     import('@/lib/firebaseSync').then(({ getSavedFirebaseConfig, getSavedCenterId, isAutoSyncEnabled, subscribeToFirebase }) => {
@@ -26,17 +27,24 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
       if (config && autoSync) {
         subscribeToFirebase(centerId, config, (remoteState) => {
-          import('@/lib/db').then(({ getDB }) => {
+          import('@/lib/db').then(({ getDB, saveDB }) => {
             const localState = getDB();
             const localUpdatedAt = localState.updatedAt || '';
             const remoteUpdatedAt = remoteState.updatedAt || '';
 
             // Only notify if the remote update is newer than local update
             if (remoteUpdatedAt && remoteUpdatedAt > localUpdatedAt) {
-              console.log('Phát hiện phiên bản mới hơn trên đám mây:', remoteUpdatedAt, '(cục bộ:', localUpdatedAt, ')');
-              setNewRemoteState(remoteState);
-              setHasNewVersion(true);
+              if (isFirstSnapshot) {
+                console.log('Tự động đồng bộ phiên bản mới nhất từ Firestore khi tải trang:', remoteUpdatedAt);
+                saveDB(remoteState, true);
+                window.location.reload();
+              } else {
+                console.log('Phát hiện phiên bản mới hơn trên đám mây:', remoteUpdatedAt, '(cục bộ:', localUpdatedAt, ')');
+                setNewRemoteState(remoteState);
+                setHasNewVersion(true);
+              }
             }
+            isFirstSnapshot = false;
           });
         }).then(unsub => {
           unsubscribe = unsub;
