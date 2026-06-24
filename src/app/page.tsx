@@ -68,7 +68,7 @@ export default function Dashboard() {
   };
 
   // Process data for grade distribution chart
-  const grades = [9, 10, 11, 12]; // Grades represented in center
+  const grades = [6, 7, 8, 9, 10, 11, 12]; // Grades represented in center
   const gradeCounts = grades.map(g => stats.gradeDistribution[g] || 0);
   const maxCount = Math.max(...gradeCounts, 5); // Fallback to 5 to avoid division by 0 and give chart head room
 

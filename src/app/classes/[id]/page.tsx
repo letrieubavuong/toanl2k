@@ -1403,7 +1403,7 @@ export default function ClassDetailsPage() {
                       value={newStudentGrade}
                       onChange={(e) => setNewStudentGrade(Number(e.target.value))}
                     >
-                      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
+                      {[6, 7, 8, 9, 10, 11, 12].map(g => (
                         <option key={g} value={g}>Khối {g}</option>
                       ))}
                     </select>
@@ -1698,7 +1698,7 @@ export default function ClassDetailsPage() {
                     value={editClassGrade}
                     onChange={(e) => setEditClassGrade(Number(e.target.value))}
                   >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
+                    {[6, 7, 8, 9, 10, 11, 12].map(g => (
                       <option key={g} value={g}>Khối {g}</option>
                     ))}
                   </select>

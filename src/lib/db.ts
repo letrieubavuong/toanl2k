@@ -5,7 +5,7 @@
 export interface Student {
   id: string;
   name: string;
-  grade: number; // 1 to 12
+  grade: number; // 6 to 12
   parentName: string;
   parentPhone: string;
   joinedDate: string; // YYYY-MM-DD
@@ -443,7 +443,7 @@ export const deleteClass = (id: string): void => {
   const db = getDB();
   db.classes = db.classes.filter(c => c.id !== id);
   db.enrollments = db.enrollments.filter(e => e.classId !== id);
-  db.attendance = db.attendance.filter(a => a.studentId !== id);
+  db.attendance = db.attendance.filter(a => a.classId !== id);
   db.payments = db.payments.filter(p => p.classId !== id);
   db.sessions = db.sessions.filter(s => s.classId !== id); // Remove class sessions as well
   saveDB(db);
@@ -596,13 +596,13 @@ export const getDashboardStats = () => {
     totalDebt += (p.totalDue - p.amountPaid);
   });
   
-  // Grade distribution (1-12)
+  // Grade distribution (6-12)
   const gradeDistribution: Record<number, number> = {};
-  for (let i = 1; i <= 12; i++) {
+  for (let i = 6; i <= 12; i++) {
     gradeDistribution[i] = 0;
   }
   db.students.forEach(s => {
-    if (s.grade >= 1 && s.grade <= 12) {
+    if (s.grade >= 6 && s.grade <= 12) {
       gradeDistribution[s.grade] = (gradeDistribution[s.grade] || 0) + 1;
     }
   });

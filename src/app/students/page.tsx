@@ -363,7 +363,7 @@ Giám Đốc Trung Tâm LÊ KHÁNH LOAN.`;
               style={{ width: '130px' }}
             >
               <option value="all">Tất cả khối</option>
-              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
+              {[6, 7, 8, 9, 10, 11, 12].map(g => (
                 <option key={g} value={g}>Khối {g}</option>
               ))}
             </select>
@@ -400,10 +400,7 @@ Giám Đốc Trung Tâm LÊ KHÁNH LOAN.`;
             <thead>
               <tr>
                 <th>Học sinh</th>
-                <th>Khối</th>
-                <th>Thông tin Phụ huynh</th>
-                <th>Lớp đang học</th>
-                <th>Học phí còn nợ</th>
+                <th>Ngày nhập học</th>
                 <th style={{ textAlign: 'right' }}>Hành động</th>
               </tr>
             </thead>
@@ -428,41 +425,11 @@ Giám Đốc Trung Tâm LÊ KHÁNH LOAN.`;
                               </span>
                             ) : null}
                           </div>
-                          <span className="std-date">Nhập học: {std.joinedDate}</span>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <span className="badge badge-secondary">Khối {std.grade}</span>
-                    </td>
-                    <td>
-                      <div className="parent-info-cell">
-                        <span className="parent-name">{std.parentName}</span>
-                        <span className="parent-phone">
-                          <Phone size={12} style={{ verticalAlign: 'middle', marginRight: '4px', display: 'inline' }} />
-                          {std.parentPhone}
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      {classes.length === 0 ? (
-                        <span className="no-class-text">Chưa vào lớp</span>
-                      ) : (
-                        <div className="classes-tags-list">
-                          {classes.map(c => (
-                            <span key={c.id} className="badge badge-info class-tag">{c.name}</span>
-                          ))}
-                        </div>
-                      )}
-                    </td>
-                    <td>
-                      {debt === 0 ? (
-                        <span className="badge badge-success">Đã hoàn thành</span>
-                      ) : (
-                        <span className="badge badge-danger" style={{ cursor: 'pointer' }} onClick={() => handleOpenPaymentModal(std)}>
-                          Nợ: {formatVND(debt)}
-                        </span>
-                      )}
+                      <span className="std-date" style={{ fontSize: '0.88rem', color: 'var(--text-main)', fontWeight: 500 }}>{std.joinedDate}</span>
                     </td>
                     <td style={{ textAlign: 'right' }}>
                       <div className="actions-cell-buttons">
@@ -549,7 +516,7 @@ Giám Đốc Trung Tâm LÊ KHÁNH LOAN.`;
                     value={studentGrade}
                     onChange={(e) => setStudentGrade(Number(e.target.value))}
                   >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
+                    {[6, 7, 8, 9, 10, 11, 12].map(g => (
                       <option key={g} value={g}>Khối {g}</option>
                     ))}
                   </select>
